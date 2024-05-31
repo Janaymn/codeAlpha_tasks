@@ -26,6 +26,8 @@ def talk(text):
 def listen():
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
+        # Reduce noise
+        recognizer.adjust_for_ambient_noise(source, duration=1)
         talk("How can I help you?")
         print("Listening...")
         recognizer.pause_threshold = 1
@@ -35,12 +37,22 @@ def listen():
         print("Recognizing...")
         command = recognizer.recognize_google(audio)
         print(f"User said: {command}\n")
-    except Exception as e:
-        print("Sorry, I did not catch that. Could you please repeat?")
+    except sr.UnknownValueError:
+        try:
+            print("Google did not understand. Trying with Sphinx...")
+            command = recognizer.recognize_sphinx(audio)
+            print(f"User said: {command}\n")
+        except sr.UnknownValueError:
+            print("Sorry, I did not catch that. Could you please repeat?")
+            return "None"
+        except sr.RequestError as e:
+            print(f"Sphinx error; {e}")
+            return "None"
+    except sr.RequestError as e:
+        print(f"Could not request results from Google Speech Recognition service; {e}")
         return "None"
     
     return command.lower()
-
 
 def search_google(query):
     """Search Google for the given query and return the top results."""
@@ -104,28 +116,37 @@ def open_notepad_and_write():
     notepad_process = subprocess.Popen(['notepad.exe'])
     time.sleep(1)  # Wait for Notepad to open
 
-    talk("You can start dictating your text. Say 'quit notepad' or 'exit notepad' to stop.")
+    talk("You can start dictating your text. Say 'goodbye' or 'exit notepad' to stop.")
     while True:
-        text_to_write = listen().lower()
-        if "quit notepad" in text_to_write or "exit notepad" in text_to_write:
+        text_to_write = listen()
+        if text_to_write == "none":
+            continue
+        if "goodbye" in text_to_write or "exit notepad" in text_to_write:
             talk("Closing Notepad.")
             notepad_process.terminate()  # Close the Notepad window
             break
         if text_to_write:
             pyautogui.typewrite(text_to_write + "\n")
             talk("Text added to Notepad")
+
     
 
     
 def run_assistant():
     command = listen()
     if "netflix" in command:
-            removeplay = command.replace("play", "").strip()
+            removeplay = command.replace("play", "").replace("open","").strip()
             movie_name = removeplay.replace("on netflix", "").strip()
             if movie_name:
                 open_netflix_movie(movie_name)
             else:
                 talk("Please specify the name of the movie or show to open on Netflix.")
+
+    elif 'play' in command:
+        song = command.replace('can you play', '')
+        talk(f'Playing {song}')
+        play_on_youtube(song)
+
     elif 'time' in command:
         # Extract timezone from the command
         timezone_str = extract_timezone_from_command(command)
@@ -146,15 +167,10 @@ def run_assistant():
         print("Sorry I cannot get the weather, you can use this link "+ weather_info +" to get it.")
         talk("Sorry I cannot get the weather, you can use this link to get it")
     
-    elif 'play' in command:
-        song = command.replace('can you play', '')
-        talk(f'Playing {song}')
-        play_on_youtube(song)
-
     elif 'who created you' in command:
         talk("Jana Ayman created me")
     
-    elif ("search for" or "what" or "who" or "how") or "is" or "are" in command :
+    elif ("search for" or "what" or "who" or "how" or "is" or "are") in command :
             query = command.replace("search for", "").replace("what is", "").strip()
             if query:
                 results = search_google(query)
