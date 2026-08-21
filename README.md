@@ -4,7 +4,6 @@
 [![AI Provider](https://img.shields.io/badge/LLM-Groq%20API-orange.svg?logo=groq&logoColor=white)](https://console.groq.com/)
 [![Speech](https://img.shields.io/badge/Speech--to--Text-Google%20SpeechRec-green.svg)](https://pypi.org/project/SpeechRecognition/)
 [![TTS](https://img.shields.io/badge/Text--to--Speech-gTTS%20%2F%20SAPI5-purple.svg)](https://pypi.org/project/gTTS/)
-[![License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE)
 
 A voice-controlled desktop assistant built with Python that combines LLM tool calling with Windows system automation. It supports Egyptian Arabic and English for voice input, desktop application control, dictation, and web searches.
 
@@ -101,8 +100,8 @@ graph TD
 
 ```powershell
 # Clone the repository
-git clone https://github.com/your-username/codeAlpha_tasks.git
-cd codeAlpha_tasks
+git clone https://github.com/your-username/Desktop-Voice-Automation-Agent.git
+cd Desktop-Voice-Automation-Agent
 
 # Create virtual environment
 python -m venv venv
@@ -147,9 +146,3 @@ python audio_assistant.py
 | **App Closing** | *"اقفلي الورد"* / *"اقفلي النوت باد"* | Executes `taskkill` to close Microsoft Word / Notepad. |
 | **YouTube** | *"شغلي أغنية لعمرو دياب على يوتيوب"* | Opens YouTube and plays requested search query. |
 | **Web Search** | *"اعملي سيرش عن أهرامات الجيزة"* | Opens Google Search in browser and reads aloud a summary. |
-
----
-
-## 📜 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
